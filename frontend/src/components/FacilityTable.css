@@ -1,0 +1,213 @@
+/* ==========================================
+   🚆 方案 2：胶囊卡片视图 + 详细表格样式
+   ========================================== */
+
+.facility-card-container {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 4px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 顶部模式切换 Bar */
+.facility-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.facility-badge-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.btn-view-toggle {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #2563eb;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-view-toggle:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+/* 🏷️ 胶囊卡片网格网布局 */
+.facility-badge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.facility-badge-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* 🟢 可乘坐胶囊 */
+.facility-badge-item.badge-allow {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+/* 🟡 条件限定/需要乘车券胶囊 */
+.facility-badge-item.badge-partial {
+  background-color: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fef08a;
+}
+
+.badge-icon {
+  font-size: 12px;
+}
+
+.badge-symbol {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-left: 2px;
+}
+
+/* 📊 矩阵表格样式 */
+.facility-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.facility-matrix-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 12px;
+}
+
+.facility-matrix-table th,
+.facility-matrix-table td {
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.th-corner {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 700;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.td-row-label {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #1e293b;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.th-col-name {
+  background-color: #f8fafc;
+  color: #334155;
+  font-weight: 600;
+}
+
+.td-symbol {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.symbol-allow {
+  color: #16a34a;
+  background-color: #f0fdf4;
+}
+
+.symbol-partial {
+  color: #d97706;
+  background-color: #fffbeb;
+}
+
+.symbol-deny {
+  color: #94a3b8;
+  background-color: #f8fafc;
+}
+
+/* 凡例说明 */
+.facility-legend-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+  padding: 6px 10px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.legend-title {
+  font-weight: 700;
+  color: #334155;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.facility-notes-box {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.facility-plain-text {
+  font-size: 13px;
+  color: #334155;
+  white-space: pre-wrap;
+}
+
+/* 🏷️ 分组胶囊样式 */
+.facility-grouped-badge-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.facility-badge-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.facility-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  margin-top: 4px;
+}

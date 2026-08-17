@@ -1,0 +1,354 @@
+{
+  "hakodate92": {
+    "ticket_id": "hakodate92",
+    "restrictions_zh": [
+      "仅限智能手机使用"
+    ]
+  },
+  "yurikogen02": {
+    "ticket_id": "yurikogen02",
+    "restrictions_zh": [
+      "含玩具美术馆入场费"
+    ]
+  },
+  "igr97": {
+    "ticket_id": "igr97",
+    "restrictions_zh": [
+      "刮开涂层后，可前往显示出的车站（涩民、岩手沼宫内、奥中山高原、目时）"
+    ]
+  },
+  "jreast071": {
+    "ticket_id": "jreast071",
+    "restrictions_zh": [
+      "不可乘坐渡良濑溪谷铁道小火车"
+    ]
+  },
+  "jreast10": {
+    "ticket_id": "jreast10",
+    "restrictions_zh": [
+      "不可乘坐东海道新干线。"
+    ]
+  },
+  "jreast37": {
+    "ticket_id": "jreast37",
+    "restrictions_zh": [
+      "仅限移动版 Suica"
+    ]
+  },
+  "jreast13": {
+    "ticket_id": "jreast13",
+    "restrictions_zh": [
+      "不可乘坐东海道新干线。"
+    ]
+  },
+  "tokyo02": {
+    "ticket_id": "tokyo02",
+    "restrictions_zh": [
+      "不可乘坐定点定员制巴士。"
+    ]
+  },
+  "toei03": {
+    "ticket_id": "toei03",
+    "restrictions_zh": [
+      "不可乘坐定点定员制巴士。"
+    ]
+  },
+  "toei23": {
+    "ticket_id": "toei23",
+    "restrictions_zh": [
+      "不可乘坐都电、都营巴士。"
+    ]
+  },
+  "toei92": {
+    "ticket_id": "toei92",
+    "restrictions_zh": [
+      "不可乘坐定点定员制巴士。"
+    ]
+  },
+  "keikyu08": {
+    "ticket_id": "keikyu08",
+    "restrictions_zh": [
+      "含指定店铺餐券",
+      "含设施使用券或伴手礼券。"
+    ]
+  },
+  "enoden03": {
+    "ticket_id": "enoden03",
+    "restrictions_zh": [
+      "含新江之岛水族馆门票"
+    ]
+  },
+  "fujikyu11": {
+    "ticket_id": "fujikyu11",
+    "restrictions_zh": [
+      "乘坐富士山特急需另行购买特急券"
+    ]
+  },
+  "fujikyu12": {
+    "ticket_id": "fujikyu12",
+    "restrictions_zh": [
+      "乘坐富士山特急需另行购买特急券"
+    ]
+  },
+  "meitetu01": {
+    "ticket_id": "meitetu01",
+    "restrictions_zh": [
+      "特别车厢需另行购买特别车票（μ Ticket）。"
+    ]
+  },
+  "meitetu11": {
+    "ticket_id": "meitetu11",
+    "restrictions_zh": [
+      "特别车厢需另行购买特别车票（μ Ticket）。"
+    ]
+  },
+  "meitetu94": {
+    "ticket_id": "meitetu94",
+    "restrictions_zh": [
+      "特别车厢需另行购买特别车票（μ Ticket）。"
+    ]
+  },
+  "guideway92": {
+    "ticket_id": "guideway92",
+    "restrictions_zh": [
+      "限 EX 服务会员",
+      "兑换地点：ゆとりーと线大曾根站"
+    ]
+  },
+  "echigo03": {
+    "ticket_id": "echigo03",
+    "restrictions_zh": [
+      "可乘坐特急“白雪”的普通车厢自由席。",
+      "不可乘坐“越后心动度假雪月花”"
+    ]
+  },
+  "echigo93": {
+    "ticket_id": "echigo93",
+    "restrictions_zh": [
+      "仅限持有当日有效的“青春18车票”者发售。",
+      "不可乘坐特急“白雪”。",
+      "不可乘坐“越后心动度假雪月花”"
+    ]
+  },
+  "matuden94": {
+    "ticket_id": "matuden94",
+    "restrictions_zh": [
+      "需先添加活动官方 LINE 账号为好友，回答其发来的问卷后获得优惠券，向工作人员出示该优惠券即可购买。"
+    ]
+  },
+  "titetu90": {
+    "ticket_id": "titetu90",
+    "restrictions_zh": [
+      "不可使用高速巴士（含城端线）、ぶりかに巴士、接驳巴士、社区巴士、富山市内周游巴士及其他特殊线路。"
+    ]
+  },
+  "kurobekyokoku01": {
+    "ticket_id": "kurobekyokoku01",
+    "restrictions_zh": [
+      "高级型：可乘坐所有车厢",
+      "基本型：仅可乘坐普通车厢"
+    ]
+  },
+  "ainokaze01": {
+    "ticket_id": "ainokaze01",
+    "restrictions_zh": [
+      "乘坐“爱之风 Liner”需另行购买 Liner 券"
+    ]
+  },
+  "toyama111": {
+    "ticket_id": "toyama111",
+    "restrictions_zh": [
+      "不可使用“一万三千尺物语”、爱之风骑行列车",
+      "乘坐“爱之风 Liner”需另行购买 Liner 券（300 日元）"
+    ]
+  },
+  "etizen91": {
+    "ticket_id": "etizen91",
+    "restrictions_zh": [
+      "为越铁沿线周游集章活动的套装商品"
+    ]
+  },
+  "jrwest202": {
+    "ticket_id": "jrwest202",
+    "restrictions_zh": [
+      "QR 电子票"
+    ]
+  },
+  "jrwest151": {
+    "ticket_id": "jrwest151",
+    "restrictions_zh": [
+      "不可乘坐“华灯号”、“丹后黑松号”。"
+    ]
+  },
+  "jrwest204": {
+    "ticket_id": "jrwest204",
+    "restrictions_zh": [
+      "QR 电子票"
+    ]
+  },
+  "jrwest203": {
+    "ticket_id": "jrwest203",
+    "restrictions_zh": [
+      "QR 电子票"
+    ]
+  },
+  "jrwest205": {
+    "ticket_id": "jrwest205",
+    "restrictions_zh": [
+      "QR 电子票"
+    ]
+  },
+  "tantetsu70": {
+    "ticket_id": "tantetsu70",
+    "restrictions_zh": [
+      "天桥立伞松公园的缆车·吊椅为往返"
+    ]
+  },
+  "surukan10": {
+    "ticket_id": "surukan10",
+    "restrictions_zh": [
+      "不可使用 IKEA 鹤滨巴士、USJ 接驳巴士"
+    ]
+  },
+  "osakamono87": {
+    "ticket_id": "osakamono87",
+    "restrictions_zh": [
+      "不可使用 IKEA 鹤滨巴士、USJ 接驳巴士"
+    ]
+  },
+  "kintetu93": {
+    "ticket_id": "kintetu93",
+    "restrictions_zh": [
+      "不可乘坐葛城山缆车及巴士线路"
+    ]
+  },
+  "keihan105": {
+    "ticket_id": "keihan105",
+    "restrictions_zh": [
+      "附解谜套装"
+    ]
+  },
+  "osakametoro94": {
+    "ticket_id": "osakametoro94",
+    "restrictions_zh": [
+      "不可使用今里 Liner"
+    ]
+  },
+  "osakametoro95": {
+    "ticket_id": "osakametoro95",
+    "restrictions_zh": [
+      "不可使用今里 Liner"
+    ]
+  },
+  "osakametoro96": {
+    "ticket_id": "osakametoro96",
+    "restrictions_zh": [
+      "不可使用今里 Liner"
+    ]
+  },
+  "osakametoro51": {
+    "ticket_id": "osakametoro51",
+    "restrictions_zh": [
+      "不可使用今里 Liner"
+    ]
+  },
+  "osakametoro98": {
+    "ticket_id": "osakametoro98",
+    "restrictions_zh": [
+      "不可使用今里 Liner"
+    ]
+  },
+  "osakametoro83": {
+    "ticket_id": "osakametoro83",
+    "restrictions_zh": [
+      "可乘坐今里 Liner",
+      "除 IKEA 鹤滨方向巴士、环球影城方向巴士、按需巴士、森之宫·京桥周游巴士外"
+    ]
+  },
+  "osakametoro99": {
+    "ticket_id": "osakametoro99",
+    "restrictions_zh": [
+      "不可使用大阪市营巴士、今里 Liner、按需巴士"
+    ]
+  },
+  "kobecity83": {
+    "ticket_id": "kobecity83",
+    "restrictions_zh": [
+      "附兵库津博物馆参观券"
+    ]
+  },
+  "kobecity84": {
+    "ticket_id": "kobecity84",
+    "restrictions_zh": [
+      "请填写申请表，并携带可证明本人身份的材料（资格确认书、学生证、舒展护照等）前往申请地点办理"
+    ]
+  },
+  "okaden94": {
+    "ticket_id": "okaden94",
+    "restrictions_zh": [
+      "需 Hareca 交通卡",
+      "购买时需出示身份证件"
+    ]
+  },
+  "hiroshima08": {
+    "ticket_id": "hiroshima08",
+    "restrictions_zh": [
+      "【不适用巴士线路】高速巴士、广岛机场利木津巴士、深夜巴士、社区巴士、活动接驳巴士、定期观光巴士",
+      "不含宫岛访问税。"
+    ]
+  },
+  "tosaden91": {
+    "ticket_id": "tosaden91",
+    "restrictions_zh": [
+      "不可使用高速巴士、MY 游巴士、临时巴士、活动巴士"
+    ]
+  },
+  "jrkyusyu111": {
+    "ticket_id": "jrkyusyu111",
+    "restrictions_zh": [
+      "需穿着或手持该车票，经人工检票口上下车"
+    ]
+  },
+  "jrkyusyu122": {
+    "ticket_id": "jrkyusyu122",
+    "restrictions_zh": [
+      "需支持感应支付的信用卡"
+    ]
+  },
+  "nishitetu81": {
+    "ticket_id": "nishitetu81",
+    "restrictions_zh": [
+      "不可乘坐高速巴士、特急巴士、社区巴士。"
+    ]
+  },
+  "nishitetu84": {
+    "ticket_id": "nishitetu84",
+    "restrictions_zh": [
+      "不可乘坐高速巴士、特急巴士、社区巴士。"
+    ]
+  },
+  "simabara12": {
+    "ticket_id": "simabara12",
+    "restrictions_zh": [
+      "除岛铁高速巴士外"
+    ]
+  },
+  "minamiaso03": {
+    "ticket_id": "minamiaso03",
+    "restrictions_zh": [
+      "小火车、海贼王 Sunny 号需另行支付指定席费用"
+    ]
+  },
+  "kumagawa93": {
+    "ticket_id": "kumagawa93",
+    "restrictions_zh": [
+      "周日·节假日因代行巴士停运，无法使用。"
+    ]
+  },
+  "kagosima81": {
+    "ticket_id": "kagosima81",
+    "restrictions_zh": [
+      "不可使用巴士"
+    ]
+  }
+}

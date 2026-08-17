@@ -1,0 +1,382 @@
+html {
+  overflow-y: scroll;
+}
+
+/* ==========================================
+   详情页主体布局
+   ========================================== */
+.detail-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #0f172a;
+}
+
+/* 返回按钮 */
+.btn-back {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-back:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+/* 详情卡片容器 */
+.detail-card {
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  text-align: left;
+}
+
+/* ==========================================
+   头部信息与 Tag
+   ========================================== */
+.detail-header {
+  margin-bottom: 24px;
+}
+
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.badge-company {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.badge-type {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.detail-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* ==========================================
+   料金看板 (Price Hero)
+   ========================================== */
+.price-hero {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 28px;
+}
+
+.price-hero-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.price-hero-label {
+  font-size: 13px;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.price-hero-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0284c7;
+  white-space: pre-line;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ==========================================
+   基本信息主体 (Section Block)
+   ========================================== */
+.section-block {
+  margin-bottom: 28px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 16px 0;
+}
+
+/* 🗺️ 路线图样式 */
+.top-map-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.top-map-header {
+  width: 100%;
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.top-map-image {
+  width: 100%;
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  cursor: zoom-in;
+  transition: opacity 0.2s ease;
+}
+
+.top-map-image:hover {
+  opacity: 0.92;
+}
+
+.top-map-tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* ==========================================
+   结构化 KV 列表 (Key-Value List)
+   ========================================== */
+.info-kv-card {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 8px 20px;
+}
+
+.info-kv-row {
+  display: flex;
+  padding: 14px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.info-kv-row:last-child {
+  border-bottom: none;
+}
+
+.info-kv-label {
+  width: 170px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.info-kv-value-text {
+  flex-grow: 1;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.info-kv-value-container {
+  flex-grow: 1;
+  min-width: 0; /* 💡 关键：防止 Flex 子项被内部大表格无限撑开 */
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+}
+
+/* 🚆 利用可能設備 展示框 */
+.facility-container-box {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #1e293b;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@media (max-width: 640px) {
+  .info-kv-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .info-kv-label {
+    width: 100%;
+  }
+}
+
+/* 利用条件列表样式 */
+.usage-conditions-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.usage-conditions-list li {
+  margin-bottom: 4px;
+}
+
+.usage-conditions-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================
+   底部动作 (Official Button)
+   ========================================== */
+.detail-actions {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+.btn-official {
+  display: inline-block;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 12px 28px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-official:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* ==========================================
+   🖼️ 路线图全屏 Lightbox 放大预览样式 (桌面端优化版)
+   ========================================== */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  animation: fadeIn 0.2s ease-out;
+  cursor: zoom-out; /* 提示点击背景可关闭 */
+}
+
+.lightbox-content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 95vw;
+  max-height: 92vh;
+  cursor: default;
+}
+
+/* 💡 关键：确保大图展开，最小宽度提升到 600px（桌面端），最大可达 95vw */
+.lightbox-image {
+  min-width: 650px; /* 强制小图在桌面端也能放大看清 */
+  width: auto;
+  height: auto;
+  max-width: 90vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  background: #ffffff;
+  padding: 8px; /* 白边衬托，提升路线图对比度 */
+}
+
+/* 关闭按钮固定在屏幕右上角，不挤压图片空间 */
+.lightbox-close-btn {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 2010;
+}
+
+.lightbox-close-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.08);
+}
+
+/* 📱 移动端适配：小屏幕下恢复自适应 */
+@media (max-width: 768px) {
+  .lightbox-overlay {
+    padding: 12px;
+  }
+  .lightbox-image {
+    min-width: unset; /* 移动端取消最小宽度限制 */
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+  .lightbox-close-btn {
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+}

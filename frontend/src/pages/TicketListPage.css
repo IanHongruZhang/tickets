@@ -1,0 +1,857 @@
+html {
+  overflow-y: scroll;
+}
+
+/* 页面整体容器 */
+.compact-page-container {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #0f172a;
+}
+
+.compact-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* ==========================================
+   左侧固定面板 (Sidebar)
+   ========================================== */
+.sidebar-panel {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 4px 0;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+  line-height: 1.25;
+}
+
+.sidebar-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.btn-lang-toggle {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-box-vertical {
+  display: flex;
+  gap: 6px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+
+.btn-search {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-vertical-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.select-filter {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #334155;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.sidebar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748b;
+  padding: 0 4px;
+}
+
+.sidebar-meta strong {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+/* PC 端默认隐藏移动端折叠按钮 */
+.btn-filter-toggle-mobile {
+  display: none;
+}
+
+/* ==========================================
+   右侧高密度数据表格 (Table View - 方案1 优化)
+   ========================================== */
+.main-content-panel {
+  flex: 1;
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  padding: 12px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* 💡 方案1核心：使用 fixed 布局限制列宽，防止超长车票名挤爆表格 */
+.ticket-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.ticket-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+/* 单元格默认垂直居中 */
+.ticket-table td {
+  padding: 10px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+/* 💡 切换铁道公司时的粗分割线 */
+.ticket-table tr.company-group-start td {
+  border-top: 2.5px solid #94a3b8;
+  padding-top: 14px;
+}
+
+.ticket-table-row:hover {
+  background-color: #f8fafc;
+}
+
+/* 1. 会社名 */
+.td-operator {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 120px; /* 确保缩放时第一列不会被挤压到低于 120px */
+}
+
+.operator-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  writing-mode: horizontal-tb !important;
+  white-space: nowrap;
+}
+
+/* 2. チケット名 (方案1：控制省略号显示) */
+.td-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.badge-inline-group {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.mini-badge {
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-mobile {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.badge-paper {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* 💡 方案1：超长车票名自动换为省略号 ... */
+.ticket-link-title {
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.ticket-link-title:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* 3. 料金 */
+.td-price {
+  white-space: nowrap;
+}
+
+.price-text-bold {
+  font-weight: 700;
+  color: #2563eb;
+  font-size: 13px;
+  white-space: nowrap !important;
+}
+
+/* 4. 状态列与胶囊 */
+.td-status {
+  white-space: nowrap;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.status-pill.status-active {
+  background-color: #e6f4ea;
+  color: #137333;
+  border: 1px solid #ceead6;
+}
+
+.status-pill.status-ended {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.status-dot {
+  font-size: 8px;
+  line-height: 1;
+}
+
+.status-date-sub {
+  font-weight: 400;
+  opacity: 0.9;
+  margin-left: 2px;
+}
+
+/* 5. 可点击交互暗示与箭头 */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f8fafc;
+}
+
+.clickable-row:hover .ticket-link-title {
+  color: #2563eb;
+}
+
+.clickable-row:hover .card-arrow-icon {
+  color: #2563eb;
+  transform: translateX(3px);
+}
+
+.card-arrow-icon {
+  font-size: 18px;
+  color: #cbd5e1;
+  font-weight: 300;
+  transition: transform 0.2s ease, color 0.2s ease;
+  margin-left: 6px;
+  user-select: none;
+}
+
+/* 6. 其它辅助组件 */
+.btn-table-detail {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-table-detail:hover {
+  background: #1d4ed8;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 80px;
+  color: #94a3b8;
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.btn-page {
+  padding: 5px 12px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-page:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-status {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* ==========================================
+   右下角悬浮 AI 按钮及弹窗
+   ========================================== */
+.btn-ai-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+}
+
+.btn-ai-float:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.55);
+}
+
+.ai-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.ai-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 560px;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ai-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.ai-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.price-notice-badge {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #4338ca;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* AI 智能回答容器靠左对齐与排版优化 */
+.ai-result-box {
+  text-align: left !important;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.markdown-body {
+  text-align: left !important;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1e293b;
+}
+
+.markdown-body h1, 
+.markdown-body h2, 
+.markdown-body h3, 
+.markdown-body h4 {
+  text-align: left !important;
+  color: #0f172a;
+  margin-top: 14px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.markdown-body p {
+  text-align: left !important;
+  margin-bottom: 10px;
+}
+
+.markdown-body ul, 
+.markdown-body ol {
+  text-align: left !important;
+  padding-left: 20px !important;
+  margin: 8px 0;
+}
+
+.markdown-body li {
+  margin-bottom: 4px;
+}
+
+.markdown-body strong {
+  color: #2563eb;
+}
+
+/* ==========================================
+   📱 移动端适配样式 (@media max-width: 768px)
+   ========================================== */
+@media (max-width: 860px) {
+  .compact-layout {
+    flex-direction: column;
+  }
+  .sidebar-panel {
+    width: 100%;
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  html, body {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .compact-page-container {
+    height: auto;
+    padding: 8px;
+    overflow: visible;
+  }
+
+  .compact-layout {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* 1. 顶部固定筛选侧边栏 */
+  .sidebar-panel {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .sidebar-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2px 6px 2px;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed #f1f5f9;
+  }
+
+  .sidebar-title {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .sidebar-subtitle {
+    display: none;
+  }
+
+  .btn-lang-toggle {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .filter-card {
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    gap: 6px;
+  }
+
+  .search-box-vertical {
+    display: flex;
+    gap: 4px;
+  }
+
+  .search-input {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .btn-search {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .filter-vertical-group {
+    display: none !important;
+  }
+
+  .filter-vertical-group.is-expanded {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .filter-item {
+    gap: 2px;
+  }
+
+  .filter-label {
+    font-size: 10px;
+  }
+
+  .select-filter {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+  .sidebar-meta {
+    font-size: 11px;
+    padding: 2px 0 0 0;
+  }
+
+  .btn-filter-toggle-mobile {
+    display: block;
+    width: 100%;
+    padding: 6px;
+    background: #f1f5f9;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* 2. 下方列表卡片式展示 */
+  .main-content-panel {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px;
+    padding-bottom: 60px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    box-sizing: border-box;
+  }
+
+  .ticket-table thead {
+    display: none !important;
+  }
+
+  .ticket-table, 
+  .ticket-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .ticket-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "operator status"
+      "name     name"
+      "price    price";
+    gap: 6px 0;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  .ticket-table tr.clickable-row {
+    position: relative;
+    padding-right: 28px;
+    background: #ffffff;
+  }
+
+  .ticket-table tr.clickable-row:active {
+    background-color: #f1f5f9;
+    transform: scale(0.995);
+  }
+
+  .ticket-table td {
+    display: block;
+    padding: 0;
+    border: none;
+    white-space: normal;
+  }
+
+  .ticket-table tr.company-group-start td {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .td-operator {
+    grid-area: operator;
+    display: flex;
+    align-items: center;
+  }
+
+  .td-status {
+    grid-area: status;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .td-status .status-pill {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+
+  .td-status .card-arrow-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    color: #94a3b8;
+    margin-left: 0;
+  }
+
+  .clickable-row:hover .card-arrow-icon {
+    transform: translateY(-50%) translateX(2px);
+  }
+
+  .td-name {
+    grid-area: name;
+    padding: 2px 0 !important;
+  }
+
+  .name-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .ticket-link-title {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-all;
+  }
+
+  .td-price {
+    grid-area: price;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 4px !important;
+    border-top: 1px dashed #f1f5f9;
+    margin-top: 2px;
+  }
+
+  .td-price::before {
+    content: "料金";
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  .price-text-bold {
+    font-size: 13px;
+  }
+
+  .pagination-bar {
+    margin-top: 8px;
+    padding-top: 6px;
+  }
+
+  /* 3. 移动端悬浮 AI 按钮 */
+  .btn-ai-float {
+    bottom: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+  }
+
+  .ai-float-text {
+    display: none;
+  }
+
+  .ai-float-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+}
