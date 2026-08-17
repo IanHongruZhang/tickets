@@ -9,3 +9,4 @@ pyarrow
 fastparquet
 numpy
 python-multipart
+requests
