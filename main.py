@@ -19,7 +19,7 @@ import requests
 # =====================================================================
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 PARQUET_JA_PATH = os.path.join(DATA_DIR, "tickets_jp_cleaned.parquet")
-PARQUET_ZH_PATH = os.path.join(DATA_DIR, "tickets_zh_cleaned.parquet")
+PARQUET_ZH_PATH = os.path.join(DATA_DIR, "tickets_cn_cleaned.parquet")
 CSV_FALLBACK_PATH = os.path.join(os.path.dirname(__file__), "tickets_en.csv")
 
 MAPS_DIR = os.path.join(DATA_DIR, "raw", "maps") if os.path.exists(os.path.join(DATA_DIR, "raw", "maps")) else "/Users/hongruzyj/Desktop/tickets/data/raw/maps"

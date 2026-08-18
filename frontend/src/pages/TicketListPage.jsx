@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import './TicketListPage.css';
 import remarkGfm from 'remark-gfm';
@@ -171,7 +171,9 @@ const I18N = {
 export default function TicketListPage() {
   const navigate = useNavigate();
 
-  const [lang, setLang] = useState('ja');
+  // 💡 状态管理：改用 useSearchParams 控制 URL 中的 lang 参数
+  const [searchParams, setSearchParams] = useSearchParams();
+  const lang = searchParams.get('lang') || 'zh';
   const t = I18N[lang];
 
   const [tickets, setTickets] = useState([]);
@@ -199,6 +201,15 @@ export default function TicketListPage() {
 
   const pageSize = 25;
   const totalPages = Math.ceil(total / pageSize) || 1;
+
+  // 切换语言方法：同步更新 URL 中的 ?lang=xxx 参数
+  const handleLangToggle = () => {
+    const nextLang = lang === 'ja' ? 'zh' : 'ja';
+    setSearchParams(prev => {
+      prev.set('lang', nextLang);
+      return prev;
+    });
+  };
 
   useEffect(() => {
     if (showAiModal) {
@@ -234,7 +245,6 @@ export default function TicketListPage() {
         operator: selectedOperator,
       });
 
-      // 💡 提取 API BASE，适应线上 Vercel 反向代理
       const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
       const res = await fetch(`${API_BASE}/api/v1/tickets?${params}`);
       
@@ -281,7 +291,6 @@ export default function TicketListPage() {
 
     setAiLoading(true);
     try {
-      // 💡 提取 API BASE，适应线上 Vercel 反向代理
       const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
       const res = await fetch(`${API_BASE}/api/v1/ai/chat`, {
         method: 'POST',
@@ -310,7 +319,7 @@ export default function TicketListPage() {
             </div>
             <button
               className="btn-lang-toggle"
-              onClick={() => setLang(lang === 'ja' ? 'zh' : 'ja')}
+              onClick={handleLangToggle}
             >
               🌐 {t.langToggle}
             </button>
@@ -414,7 +423,7 @@ export default function TicketListPage() {
           </div>
         </aside>
 
-        {/* 右侧/下方 数据列表直接渲染后端排序完的结果 */}
+        {/* 右侧/下方 数据列表 */}
         <main className="main-content-panel">
           {loading ? (
             <div className="loading-state">Loading...</div>
@@ -434,7 +443,6 @@ export default function TicketListPage() {
                     const rawPrice = tItem.price || tItem.price_text || tItem.price_raw || tItem['料金'] || '-';
                     const isEnded = tItem.is_ended || (tItem.sale_status_raw && tItem.sale_status_raw.includes('終了'));
 
-                    // 💡 修复：按照展示文案进行对比，防止会社名长短不一导致异常分割线
                     const currentDisplayOp = formatOperator(tItem.operator, lang);
                     const prevDisplayOp = index > 0 ? formatOperator(tickets[index - 1].operator, lang) : null;
                     const isNewOperatorGroup = index > 0 && currentDisplayOp !== prevDisplayOp;

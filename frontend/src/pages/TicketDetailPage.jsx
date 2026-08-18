@@ -107,8 +107,10 @@ function renderAvailableFacilities(val, lang = 'ja') {
 export default function TicketDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const lang = searchParams.get('lang') || 'ja';
+  
+  // 💡 使用 useSearchParams 可读写 lang 参数
+  const [searchParams, setSearchParams] = useSearchParams();
+  const lang = searchParams.get('lang') || 'zh';
 
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -119,12 +121,20 @@ export default function TicketDetailPage() {
 
   const isJa = lang === 'ja';
 
+  // 切换语言方法
+  const handleLangToggle = () => {
+    const nextLang = lang === 'ja' ? 'zh' : 'ja';
+    setSearchParams(prev => {
+      prev.set('lang', nextLang);
+      return prev;
+    });
+  };
+
   useEffect(() => {
     const fetchTicketDetail = async () => {
       setLoading(true);
       setErrorMsg(null);
       try {
-        // 💡 提取 API BASE，适应线上 Vercel 反向代理
         const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
         const res = await fetch(`${API_BASE}/api/v1/tickets/${id}?lang=${lang}`);
         
@@ -159,9 +169,14 @@ export default function TicketDetailPage() {
   if (errorMsg || !ticket) {
     return (
       <div className="detail-container">
-        <button className="btn-back" onClick={() => navigate('/')}>
-          {isJa ? '← 一覧へ戻る' : '← 返回列表'}
-        </button>
+        <div className="detail-top-bar">
+          <button className="btn-back" onClick={() => navigate(`/?lang=${lang}`)}>
+            {isJa ? '← 一覧へ戻る' : '← 返回列表'}
+          </button>
+          <button className="btn-lang-toggle" onClick={handleLangToggle}>
+            🌐 {isJa ? '🇨🇳 中文版' : '🇯🇵 日本語'}
+          </button>
+        </div>
         <div style={{ textAlign: 'center', padding: '60px', color: '#ef4444' }}>
           {isJa ? 'チケット情報が見つかりませんでした' : '未找到相关票券信息或接口报错'}
           {errorMsg && <div style={{ fontSize: '12px', marginTop: '8px', color: '#94a3b8' }}>{errorMsg}</div>}
@@ -170,15 +185,24 @@ export default function TicketDetailPage() {
     );
   }
 
+
   // 1. 处理料金字段
   const rawPrice = ticket.price_text || ticket.price || ticket.price_raw || ticket['料金'] || '-';
-  const priceText = typeof rawPrice === 'string'
+  let priceText = typeof rawPrice === 'string'
     ? rawPrice
         .split(/\r?\n/)
         .map(line => line.trim())
         .filter(Boolean)
         .join('\n')
     : String(rawPrice || '-');
+
+  // 💡 2. 如果当前是中文版，前端对残余日文词汇自动进行格式化降级替换
+  if (!isJa && priceText) {
+    priceText = priceText
+      .replace(/大人[：:]?/g, '成人：')
+      .replace(/小人[：:]?/g, '儿童：')
+      .replace(/円/g, '日元');
+  }
 
   // 2. 自由乘车区间说明
   const hasFreeAreaNote = ticket.free_area_note && 
@@ -193,9 +217,15 @@ export default function TicketDetailPage() {
 
   return (
     <div className="detail-container">
-      <button className="btn-back" onClick={() => navigate('/')}>
-        {isJa ? '← チケット一覧へ' : '← 返回票券列表'}
-      </button>
+      {/* 💡 顶部操作与语言切换栏 */}
+      <div className="detail-top-bar">
+        <button className="btn-back" onClick={() => navigate(`/?lang=${lang}`)}>
+          {isJa ? '← チケット一覧へ' : '← 返回票券列表'}
+        </button>
+        <button className="btn-lang-toggle" onClick={handleLangToggle}>
+          🌐 {isJa ? '🇨🇳 中文版' : '🇯🇵 日本語'}
+        </button>
+      </div>
 
       <div className="detail-card">
         <header className="detail-header">
