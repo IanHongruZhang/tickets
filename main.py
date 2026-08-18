@@ -547,8 +547,10 @@ def get_company_weight_backend(row: pd.Series) -> int:
 # =====================================================================
 # 4. API 路由
 # =====================================================================
+# ✅ 标准写法：用双装饰器同时监听 GET 和 HEAD 请求
 @app.get("/api/v1/tickets")
-def get_tickets(
+@app.head("/api/v1/tickets")
+async def get_tickets(
     lang: str = Query("ja", description="语言选择: ja | zh"),
     page: int = Query(1, ge=1),
     page_size: int = Query(18, ge=1, le=100),
