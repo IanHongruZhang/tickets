@@ -1,9 +1,9 @@
 import os
-from dotenv import load_dotenv
 import re
 import json
 import asyncio
 from typing import Optional, List, Any
+from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +13,16 @@ from pydantic import BaseModel
 import pandas as pd
 import numpy as np
 import requests
+from dotenv import load_dotenv
+
+# 引入 ChromaDB 与 LangChain Core
+from langchain_chroma import Chroma
+from langchain_core.embeddings import Embeddings
+import dashscope
+from dashscope import TextEmbedding, Generation
+
+# 加载环境变量
+load_dotenv()
 
 # =====================================================================
 # 1. 数据全局内存缓存与 Lifespan 预加载路径配置
@@ -84,58 +94,85 @@ else:
 
 
 # =====================================================================
-# 2. 真实接入 Databricks 向量检索与 LLM 的 RAG 核心服务 (支持异步线程池)
+# 2. 原生 DashScope (通义千问) + 本地 ChromaDB 向量检索与 LLM RAG 服务
 # =====================================================================
-load_dotenv()
 
-class RAGService:
+class NativeDashScopeEmbeddings(Embeddings):
+    """避开 OpenAI tiktoken 和 Rust 编译依赖的原生 Embedding 实现"""
+    def __init__(self, key: str, model: str = "text-embedding-v2"):
+        self.key = key
+        self.model = model
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        batch_size = 25
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            resp = TextEmbedding.call(model=self.model, input=batch, api_key=self.key)
+            if resp.status_code == 200:
+                all_embeddings.extend([item['embedding'] for item in resp.output['embeddings']])
+            else:
+                raise Exception(f"DashScope Embedding Error: {resp.message}")
+        return all_embeddings
+
+    def embed_query(self, text: str) -> list[float]:
+        return self.embed_documents([text])[0]
+
+
+class LocalChromaRAGService:
     def __init__(self):
-        self.workspace_url = os.getenv("DATABRICKS_HOST", "https://dbc-4333ffee-f34e.cloud.databricks.com")
-        self.token = os.getenv("DATABRICKS_TOKEN", "")
+        self.api_key = os.getenv("DASHSCOPE_API_KEY", "").strip()
+        self.vectorstore = None
 
-        clean_token = re.sub(r"[^\x00-\x7F]+", "", self.token).replace("Bearer ", "").strip()
-        self.headers = {
-            "Authorization": f"Bearer {clean_token}",
-            "Content-Type": "application/json",
-        }
+        # 确定 ChromaDB 文件存储路径
+        BASE_DIR = Path(__file__).resolve().parent
+        CHROMA_DIR = BASE_DIR / "data" / "chroma_db"
+        if not CHROMA_DIR.exists():
+            CHROMA_DIR = BASE_DIR / "chroma_db"
 
-        self.index_name = "workspace.ticket.tickets_jp_index"
-        self.query_url = f"{self.workspace_url}/api/2.0/vector-search/indexes/{self.index_name}/query"
-        self.selected_model = "databricks-gpt-oss-20b"
+        if self.api_key and CHROMA_DIR.exists():
+            try:
+                embeddings = NativeDashScopeEmbeddings(key=self.api_key)
+                self.vectorstore = Chroma(
+                    persist_directory=str(CHROMA_DIR),
+                    embedding_function=embeddings
+                )
+                print(f"✅ [RAG] 本地 ChromaDB 向量库已就绪: {CHROMA_DIR}")
+            except Exception as e:
+                print(f"❌ [RAG] 初始化 ChromaDB 异常: {e}")
+        else:
+            print(f"⚠️ [RAG] 数据库或 API Key 未准备就绪 (Key 存在: {bool(self.api_key)}, Path 存在: {CHROMA_DIR.exists()})")
 
     async def answer_question(self, query: str, lang: str = "ja", top_k: int = 3) -> dict:
-        try:
-            search_payload = {
-                "columns": ["ticket_id", "ticket_name", "free_area", "price_text"],
-                "query_text": query,
-                "num_results": top_k,
+        if not self.api_key:
+            return {
+                "answer": "抱歉，服务器未配置 DASHSCOPE_API_KEY，无法调用 AI 问答功能。",
+                "sources": []
             }
 
-            vs_resp = await asyncio.to_thread(
-                requests.post,
-                self.query_url,
-                headers=self.headers,
-                data=json.dumps(search_payload),
-                timeout=15
+        if not self.vectorstore:
+            return {
+                "answer": "抱歉，向量数据库未找到，请检查 data/chroma_db 是否正确部署。",
+                "sources": []
+            }
+
+        try:
+            # 1. 向量数据库相关性检索 (运行在异步线程池防止阻塞 API)
+            results = await asyncio.to_thread(
+                self.vectorstore.similarity_search,
+                query,
+                k=top_k
             )
-
-            if vs_resp.status_code != 200:
-                print(f"❌ [Vector Search Error]: {vs_resp.text}")
-                return {
-                    "answer": "抱歉，向量数据库检索失败，请检查账号 Token 与数据库状态。",
-                    "sources": []
-                }
-
-            vs_data = vs_resp.json()
-            retrieved_rows = vs_data.get("result", {}).get("data_array", [])
 
             sources = []
             context_text = ""
-            for idx, item in enumerate(retrieved_rows, 1):
-                t_id, t_name, free_area, price = item[0], item[1], item[2], item[3]
+            for idx, doc in enumerate(results, 1):
+                t_id = doc.metadata.get("ticket_id", f"TICK-{idx}")
+                t_name = doc.metadata.get("ticket_name", "未知票券")
                 sources.append({"ticket_id": t_id, "ticket_name": t_name})
-                context_text += f"\n--- 门票信息 {idx} ---\n门票ID: {t_id}\n门票名称: {t_name}\n适用区间: {free_area}\n价格说明: {price}\n"
+                context_text += f"\n--- 票券资料 {idx} ---\n{doc.page_content}\n"
 
+            # 2. 构造通义千问 LLM Prompt
             is_zh = (lang == "zh")
             system_prompt = (
                 "你是一个专业的日本旅游交通专家。"
@@ -147,43 +184,28 @@ class RAGService:
 
             user_prompt = f"【门票资料】：\n{context_text}\n\n【用户问题】：\n{query}\n\n请为用户推荐最合适的门票，并说明理由、适用区间和价格："
 
-            llm_payload = {
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                "temperature": 0.1,
-                "max_tokens": 2000,
-            }
+            # 3. 异步调用阿里通义千问大模型 (qwen-turbo)
+            def call_llm():
+                return Generation.call(
+                    model="qwen-turbo",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    api_key=self.api_key,
+                    result_format='message'
+                )
 
-            llm_url = f"{self.workspace_url}/serving-endpoints/{self.selected_model}/invocations"
-            llm_resp = await asyncio.to_thread(
-                requests.post,
-                llm_url,
-                headers=self.headers,
-                data=json.dumps(llm_payload),
-                timeout=30
-            )
+            llm_resp = await asyncio.to_thread(call_llm)
 
             if llm_resp.status_code != 200:
-                print(f"❌ [LLM Error]: {llm_resp.text}")
+                print(f"❌ [DashScope LLM Error]: {llm_resp.message}")
                 return {
-                    "answer": "检索到了相关票券，但生成回答超时，请稍后重试。",
+                    "answer": f"检索到了相关票券，但生成回答失败: {llm_resp.message}",
                     "sources": sources
                 }
 
-            res_json = llm_resp.json()
-            raw_message = res_json["choices"][0]["message"]["content"]
-
-            clean_text = ""
-            if isinstance(raw_message, list):
-                for block in raw_message:
-                    if isinstance(block, dict) and block.get("type") == "text":
-                        clean_text += block.get("text", "")
-                    elif isinstance(block, str):
-                        clean_text += block
-            elif isinstance(raw_message, str):
-                clean_text = raw_message
+            clean_text = llm_resp.output.choices[0].message.content
 
             return {
                 "answer": clean_text.strip(),
@@ -195,7 +217,7 @@ class RAGService:
             print(f"❌ [RAG Exception]: {e}")
             return {"answer": f"RAG 服务运行时异常: {str(e)}", "sources": []}
 
-rag_service = RAGService()
+rag_service = LocalChromaRAGService()
 
 
 # =====================================================================
@@ -254,94 +276,6 @@ def safe_bool(val) -> bool:
         return cleaned
     str_v = str(cleaned).strip().lower()
     return str_v in ["true", "1", "t", "y", "yes"]
-
-
-# =====================================================================
-# 💡 标准 17 列设备表头定义与动态名称映射字典 (关键定义，解决 NameError)
-# =====================================================================
-STANDARD_JR_HEADER_TREE = [
-    {
-        "name": "東海道新幹線",
-        "children": [{"name": "-"}]
-    },
-    {
-        "name": "北海道新幹線",
-        "children": [{"name": "-"}]
-    },
-    {
-        "name": "東北・秋田・山形・上越・北陸新幹線",
-        "children": [
-            {"name": "グランクラス"},
-            {"name": "グリーン車"},
-            {"name": "普通車指定"},
-            {"name": "普通車自由"}
-        ]
-    },
-    {
-        "name": "在来線特急/急行",
-        "children": [
-            {"name": "A寝台車"},
-            {"name": "B寝台車"},
-            {"name": "グリーン車"},
-            {"name": "普通車指定"},
-            {"name": "普通車自由"}
-        ]
-    },
-    {
-        "name": "快速・普通",
-        "children": [
-            {"name": "グリーン車指定"},
-            {"name": "グリーン車自由"},
-            {"name": "ライナー"},
-            {"name": "指定"},
-            {"name": "自由"}
-        ]
-    },
-    {
-        "name": "BRT",
-        "children": [{"name": "-"}]
-    }
-]
-
-# 精准名称映射字典（将各种不规范的原始列名归一化到 17 列索引）
-COLUMN_NAME_TO_INDEX = {
-    # 快速·普通列车
-    "普通車自由": 15,
-    "自由": 15,
-    "普通車指定": 14,
-    "指定": 14,
-    "ライナー": 13,
-    "グリーン車自由": 12,
-    "グリーン車指定": 11,
-    "グリーン車": 11,
-    "特急": 10,
-    "急行": 10,
-    
-    # 新干线 / 寝台
-    "A寝台車": 6,
-    "B寝台車": 7,
-    "グランクラス": 2,
-    "BRT": 16,
-}
-
-def align_by_column_names(columns: list, raw_symbols: list) -> list:
-    """
-    💡 智能动态对齐算法：根据票券数据里自带的【列名】，精准填入 17 列大表中对应的正确位置！
-    未匹配到的位置全部安全填充 '×' (不可乘坐)！
-    """
-    aligned = ["×"] * 17
-
-    if not isinstance(columns, list) or not isinstance(raw_symbols, list):
-        return aligned
-
-    for col_name, symbol in zip(columns, raw_symbols):
-        clean_name = str(col_name).strip()
-        target_idx = COLUMN_NAME_TO_INDEX.get(clean_name)
-        
-        if target_idx is not None and 0 <= target_idx < 17:
-            aligned[target_idx] = symbol if symbol else "×"
-
-    return aligned
 
 
 def normalize_facilities_structure(val: Any) -> Any:
@@ -547,7 +481,7 @@ def get_company_weight_backend(row: pd.Series) -> int:
 # =====================================================================
 # 4. API 路由
 # =====================================================================
-# ✅ 标准写法：用双装饰器同时监听 GET 和 HEAD 请求
+# ✅ 双装饰器：精准防 405 Method Not Allowed 错误，全面支持 UptimeRobot 保活
 @app.get("/api/v1/tickets")
 @app.head("/api/v1/tickets")
 async def get_tickets(
