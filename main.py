@@ -96,15 +96,14 @@ else:
 # =====================================================================
 # 2. 原生 DashScope (通义千问) + 本地 ChromaDB 向量检索与 LLM RAG 服务
 # =====================================================================
-
 class NativeDashScopeEmbeddings(Embeddings):
     """避开 OpenAI tiktoken 和 Rust 编译依赖的原生 Embedding 实现"""
-    def __init__(self, key: str, model: str = "text-embedding-v2"):
+    def __init__(self, key: str, model: str = "qwen3.7-text-embedding"):  # 💡 保持与 build_rag.py 一致
         self.key = key
         self.model = model
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        batch_size = 25
+        batch_size = 10
         all_embeddings = []
         for i in range(0, len(texts), batch_size):
             batch = texts[i:i + batch_size]
@@ -124,7 +123,6 @@ class LocalChromaRAGService:
         self.api_key = os.getenv("DASHSCOPE_API_KEY", "").strip()
         self.vectorstore = None
 
-        # 确定 ChromaDB 文件存储路径
         BASE_DIR = Path(__file__).resolve().parent
         CHROMA_DIR = BASE_DIR / "data" / "chroma_db"
         if not CHROMA_DIR.exists():
@@ -143,25 +141,43 @@ class LocalChromaRAGService:
         else:
             print(f"⚠️ [RAG] 数据库或 API Key 未准备就绪 (Key 存在: {bool(self.api_key)}, Path 存在: {CHROMA_DIR.exists()})")
 
-    async def answer_question(self, query: str, lang: str = "ja", top_k: int = 3) -> dict:
-        if not self.api_key:
-            return {
-                "answer": "抱歉，服务器未配置 DASHSCOPE_API_KEY，无法调用 AI 问答功能。",
-                "sources": []
-            }
-
-        if not self.vectorstore:
-            return {
-                "answer": "抱歉，向量数据库未找到，请检查 data/chroma_db 是否正确部署。",
-                "sources": []
-            }
+    async def answer_question(self, query: str, lang: str = "ja", top_k: int = 5) -> dict: # 💡 1. top_k 改为 5
+        if not self.api_key or not self.vectorstore:
+            return {"answer": "服务未配置 DASHSCOPE_API_KEY 或向量数据库未配置", "sources": []}
 
         try:
-            # 1. 向量数据库相关性检索 (运行在异步线程池防止阻塞 API)
+            # 1. 多条件硬编码过滤字典 ($and 逻辑)
+            filter_conditions = []
+
+            # 在售状态硬过滤
+            if any(kw in query for kw in ["在卖", "正在发售", "在售", "现售", "还能买", "目前有"]):
+                filter_conditions.append({"is_ended": False})
+
+            # 地域/全国硬过滤
+            if any(kw in query for kw in ["全国", "全日本", "Japan Rail Pass", "全国通用"]):
+                filter_conditions.append({"is_national": True})
+            elif "关东" in query or "関東" in query:
+                filter_conditions.append({"region_code": "kanto"})
+            elif "关西" in query or "関西" in query or "近畿" in query:
+                filter_conditions.append({"region_code": "kinki"})
+            elif "北海道" in query:
+                filter_conditions.append({"region_code": "hokkaido"})
+            elif "九州" in query:
+                filter_conditions.append({"region_code": "kyusyu"})
+
+            if len(filter_conditions) == 1:
+                filter_condition = filter_conditions[0]
+            elif len(filter_conditions) > 1:
+                filter_condition = {"$and": filter_conditions}
+            else:
+                filter_condition = None
+
+            # 2. 检索 top_k=5 条数据
             results = await asyncio.to_thread(
                 self.vectorstore.similarity_search,
                 query,
-                k=top_k
+                k=top_k,
+                filter=filter_condition
             )
 
             sources = []
@@ -170,21 +186,21 @@ class LocalChromaRAGService:
                 t_id = doc.metadata.get("ticket_id", f"TICK-{idx}")
                 t_name = doc.metadata.get("ticket_name", "未知票券")
                 sources.append({"ticket_id": t_id, "ticket_name": t_name})
-                context_text += f"\n--- 票券资料 {idx} ---\n{doc.page_content}\n"
+                context_text += f"\n--- 资料 {idx} ---\n{doc.page_content}\n"
 
-            # 2. 构造通义千问 LLM Prompt
+            # 3. 引导提供多备选的 Prompt
             is_zh = (lang == "zh")
             system_prompt = (
-                "你是一个专业的日本旅游交通专家。"
-                "请严格根据下面提供的【门票资料】回答用户的提问。"
-                f"【指令】：必须全篇使用{'中文' if is_zh else '日文'}回答！"
-                "严禁使用 HTML 标签（如 <br>），严禁画 Markdown 表格（|---|\）！"
-                "请全部使用【标题 + 列表 bullet points（* 或 -）】的清晰格式排版回答。"
+                "你是专业的日本交通票券助手。请【严格仅凭】提供的【门票资料】回答。\n\n"
+                "【核心规则】：\n"
+                "1. 如果【门票资料】中有多个符合用户条件的票券，请【尽可能全部列出】作为备选推荐！\n"
+                "2. 绝对不要推荐写明“绝对非全国通用票券”或不满足要求的票券！\n"
+                "3. 若资料中没有任何符合条件的票，才直接回答：'资料库中暂未找到符合条件的票券。'\n"
+                "4. 格式要求：全篇使用中文列表（* 或 -）排版，严禁使用 HTML 及 Markdown 表格。"
             )
 
-            user_prompt = f"【门票资料】：\n{context_text}\n\n【用户问题】：\n{query}\n\n请为用户推荐最合适的门票，并说明理由、适用区间和价格："
+            user_prompt = f"【门票资料】：\n{context_text}\n\n【用户提问】：\n{query}\n\n请列出所有符合要求的备选票券并简要说明理由与售价："
 
-            # 3. 异步调用阿里通义千问大模型 (qwen-turbo)
             def call_llm():
                 return Generation.call(
                     model="qwen-turbo",
@@ -199,23 +215,23 @@ class LocalChromaRAGService:
             llm_resp = await asyncio.to_thread(call_llm)
 
             if llm_resp.status_code != 200:
-                print(f"❌ [DashScope LLM Error]: {llm_resp.message}")
-                return {
-                    "answer": f"检索到了相关票券，但生成回答失败: {llm_resp.message}",
-                    "sources": sources
-                }
+                return {"answer": f"生成失败: {llm_resp.message}", "sources": sources}
 
-            clean_text = llm_resp.output.choices[0].message.content
+            clean_text = llm_resp.output.choices[0].message.content.strip()
+
+            final_sources = sources
+            if "未找到符合" in clean_text or "未检索到" in clean_text or "暂未找到" in clean_text:
+                final_sources = []
 
             return {
-                "answer": clean_text.strip(),
-                "referenced_ticket_ids": [s["ticket_id"] for s in sources],
-                "sources": sources
+                "answer": clean_text,
+                "referenced_ticket_ids": [s["ticket_id"] for s in final_sources],
+                "sources": final_sources
             }
 
         except Exception as e:
             print(f"❌ [RAG Exception]: {e}")
-            return {"answer": f"RAG 服务运行时异常: {str(e)}", "sources": []}
+            return {"answer": f"服务运行异常: {str(e)}", "sources": []}
 
 rag_service = LocalChromaRAGService()
 
